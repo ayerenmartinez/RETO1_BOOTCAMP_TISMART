@@ -262,5 +262,35 @@ EXCEPTION
         RAISE_APPLICATION_ERROR(-20002, 'Error al actualizar el hospital: ' || SQLERRM);
 END SP_HOSPITAL_ACTUALIZAR;
 
+--ELIMINAR HOSPITAL
+CREATE OR REPLACE PROCEDURE SP_HOSPITAL_ELIMINAR (
+    p_idHospital IN HOSPITAL.IDHOSPITAL%TYPE
+) IS
+    v_count INTEGER;
+BEGIN
+    -- Verificar si el hospital existe
+    SELECT COUNT(*)
+    INTO v_count
+    FROM HOSPITAL
+    WHERE IDHOSPITAL = p_idHospital;
+
+    IF v_count = 0 THEN
+        -- Si el hospital no existe, lanzar una excepción
+        RAISE_APPLICATION_ERROR(-20001, 'El hospital con ID ' || p_idHospital || ' no existe.');
+    ELSE
+        -- Eliminar el registro del hospital
+        DELETE FROM HOSPITAL
+        WHERE IDHOSPITAL = p_idHospital;
+
+        -- Confirmar la transacción
+        COMMIT;
+    END IF;
+EXCEPTION
+    WHEN OTHERS THEN
+        -- Manejo de excepciones
+        ROLLBACK;
+        RAISE_APPLICATION_ERROR(-20002, 'Error al eliminar el hospital: ' || SQLERRM);
+END SP_HOSPITAL_ELIMINAR;
+/
 
 
