@@ -291,6 +291,24 @@ EXCEPTION
         ROLLBACK;
         RAISE_APPLICATION_ERROR(-20002, 'Error al eliminar el hospital: ' || SQLERRM);
 END SP_HOSPITAL_ELIMINAR;
-/
 
+--LISTAR HOSPITAL
+CREATE OR REPLACE PROCEDURE SP_HOSPITAL_LISTAR IS
+BEGIN
+    -- Seleccionar todos los hospitales
+    FOR r IN (
+        SELECT * FROM HOSPITAL
+    ) LOOP
+        -- Imprimir los resultados (puede ajustarse según el entorno de ejecución)
+        DBMS_OUTPUT.PUT_LINE('ID Hospital: ' || r.IDHOSPITAL || 
+                             ', Nombre: ' || r.NOMBRE || 
+                             ', Antigüedad: ' || r.ANTIGUEDAD || 
+                             ', Área: ' || r.AREA || 
+                             ', ID Distrito: ' || r.IDDISTRITO || 
+                             ', ID Sede: ' || r.IDSEDE || 
+                             ', ID Gerente: ' || r.IDGERENTE || 
+                             ', ID Condición: ' || r.IDCONDICION || 
+                             ', Fecha Registro: ' || r.FECHAREGISTRO);
+    END LOOP;
+END SP_HOSPITAL_LISTAR;
 
