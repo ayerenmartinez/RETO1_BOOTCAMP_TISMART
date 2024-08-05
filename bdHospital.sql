@@ -218,6 +218,49 @@ EXCEPTION
         RAISE;
 END SP_HOSPITAL_REGISTRAR;
 
+--ACTUALIZAR HOSPITAL
+CREATE OR REPLACE PROCEDURE SP_HOSPITAL_ACTUALIZAR (
+    p_idHospital  IN HOSPITAL.IDHOSPITAL%TYPE,
+    p_idDistrito  IN HOSPITAL.IDDISTRITO%TYPE,
+    p_nombre      IN HOSPITAL.NOMBRE%TYPE,
+    p_antiguedad  IN HOSPITAL.ANTIGUEDAD%TYPE,
+    p_area        IN HOSPITAL.AREA%TYPE,
+    p_idSede      IN HOSPITAL.IDSEDE%TYPE,
+    p_idGerente   IN HOSPITAL.IDGERENTE%TYPE,
+    p_idCondicion IN HOSPITAL.IDCONDICION%TYPE
+) IS
+    v_count INTEGER;
+BEGIN
+    -- Verificar si el hospital existe
+    SELECT COUNT(*)
+    INTO v_count
+    FROM HOSPITAL
+    WHERE IDHOSPITAL = p_idHospital;
+
+    IF v_count = 0 THEN
+        -- Si el hospital no existe, lanzar una excepción
+        RAISE_APPLICATION_ERROR(-20001, 'El hospital con ID ' || p_idHospital || ' no existe.');
+    END IF;
+
+    -- Actualizar el registro del hospital
+    UPDATE HOSPITAL
+    SET IDDISTRITO = p_idDistrito,
+        NOMBRE = p_nombre,
+        ANTIGUEDAD = p_antiguedad,
+        AREA = p_area,
+        IDSEDE = p_idSede,
+        IDGERENTE = p_idGerente,
+        IDCONDICION = p_idCondicion
+    WHERE IDHOSPITAL = p_idHospital;
+
+    -- Confirmar la transacción
+    COMMIT;
+EXCEPTION
+    WHEN OTHERS THEN
+        -- Manejo de excepciones
+        ROLLBACK;
+        RAISE_APPLICATION_ERROR(-20002, 'Error al actualizar el hospital: ' || SQLERRM);
+END SP_HOSPITAL_ACTUALIZAR;
 
 
 
