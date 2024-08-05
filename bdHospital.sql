@@ -41,6 +41,18 @@ descSede varchar(150),
 fechaRegistro timestamp default systimestamp
 );
 
+-- Insertar registros reales en SEDE
+INSERT INTO SEDE (IDSEDE, DESCSEDE) VALUES (1, 'Sede Central');
+INSERT INTO SEDE (IDSEDE, DESCSEDE) VALUES (2, 'Sede Norte');
+INSERT INTO SEDE (IDSEDE, DESCSEDE) VALUES (3, 'Sede Sur');
+INSERT INTO SEDE (IDSEDE, DESCSEDE) VALUES (4, 'Sede Este');
+INSERT INTO SEDE (IDSEDE, DESCSEDE) VALUES (5, 'Sede Oeste');
+INSERT INTO SEDE (IDSEDE, DESCSEDE) VALUES (6, 'Sede Centro');
+INSERT INTO SEDE (IDSEDE, DESCSEDE) VALUES (7, 'Sede Internacional');
+INSERT INTO SEDE (IDSEDE, DESCSEDE) VALUES (8, 'Sede Nacional');
+INSERT INTO SEDE (IDSEDE, DESCSEDE) VALUES (9, 'Sede Regional');
+INSERT INTO SEDE (IDSEDE, DESCSEDE) VALUES (10, 'Sede Local');
+
 create table provincia(
 idProvincia int primary key,
 descProvincia varchar(150),
