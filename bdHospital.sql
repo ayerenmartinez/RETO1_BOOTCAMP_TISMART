@@ -106,3 +106,118 @@ constraint fk_hospital_sede foreign key(idSede) references sede(idSede),
 constraint fk_hospital_gerente foreign key(idGerente) references gerente(idGerente),
 constraint fk_hospital_condicion foreign key(idCondicion) references condicion(idCondicion)
 );
+
+--PROCEDIMIENTO ALMACENADO PARA REGISTRAR HOSPITAL
+CREATE OR REPLACE PROCEDURE SP_HOSPITAL_REGISTRAR (
+    p_idHospital  IN HOSPITAL.IDHOSPITAL%TYPE,
+    p_idDistrito  IN HOSPITAL.IDDISTRITO%TYPE,
+    p_nombre      IN HOSPITAL.NOMBRE%TYPE,
+    p_antiguedad  IN HOSPITAL.ANTIGUEDAD%TYPE,
+    p_area        IN HOSPITAL.AREA%TYPE,
+    p_idSede      IN HOSPITAL.IDSEDE%TYPE,
+    p_idGerente   IN HOSPITAL.IDGERENTE%TYPE,
+    p_idCondicion IN HOSPITAL.IDCONDICION%TYPE
+) IS
+    v_exists INTEGER;
+BEGIN
+    -- Validar los parámetros de entrada
+    IF p_idHospital IS NULL OR p_idDistrito IS NULL OR p_nombre IS NULL OR
+       p_antiguedad IS NULL OR p_area IS NULL OR p_idSede IS NULL OR
+       p_idGerente IS NULL OR p_idCondicion IS NULL THEN
+        RAISE_APPLICATION_ERROR(-20006, 'Uno o más parámetros de entrada son NULL.');
+    END IF;
+
+    -- Verificar si el hospital ya existe
+    SELECT COUNT(*) INTO v_exists
+    FROM HOSPITAL
+    WHERE IDHOSPITAL = p_idHospital;
+
+    IF v_exists > 0 THEN
+        -- Si el hospital ya existe, lanzar una excepción
+        RAISE_APPLICATION_ERROR(-20001, 'El hospital con ID ' || p_idHospital || ' ya existe.');
+    ELSE
+        -- Verificar la existencia de los valores referenciados
+        BEGIN
+            SELECT COUNT(*) INTO v_exists
+            FROM DISTRITO
+            WHERE IDDISTRITO = p_idDistrito;
+            IF v_exists = 0 THEN
+                RAISE_APPLICATION_ERROR(-20002, 'El distrito con ID ' || p_idDistrito || ' no existe.');
+            END IF;
+        EXCEPTION
+            WHEN OTHERS THEN
+                RAISE_APPLICATION_ERROR(-20002, 'Error al verificar distrito con ID ' || p_idDistrito);
+        END;
+
+        BEGIN
+            SELECT COUNT(*) INTO v_exists
+            FROM SEDE
+            WHERE IDSEDE = p_idSede;
+            IF v_exists = 0 THEN
+                RAISE_APPLICATION_ERROR(-20003, 'La sede con ID ' || p_idSede || ' no existe.');
+            END IF;
+        EXCEPTION
+            WHEN OTHERS THEN
+                RAISE_APPLICATION_ERROR(-20003, 'Error al verificar sede con ID ' || p_idSede);
+        END;
+
+        BEGIN
+            SELECT COUNT(*) INTO v_exists
+            FROM GERENTE
+            WHERE IDGERENTE = p_idGerente;
+            IF v_exists = 0 THEN
+                RAISE_APPLICATION_ERROR(-20004, 'El gerente con ID ' || p_idGerente || ' no existe.');
+            END IF;
+        EXCEPTION
+            WHEN OTHERS THEN
+                RAISE_APPLICATION_ERROR(-20004, 'Error al verificar gerente con ID ' || p_idGerente);
+        END;
+
+        BEGIN
+            SELECT COUNT(*) INTO v_exists
+            FROM CONDICION
+            WHERE IDCONDICION = p_idCondicion;
+            IF v_exists = 0 THEN
+                RAISE_APPLICATION_ERROR(-20005, 'La condición con ID ' || p_idCondicion || ' no existe.');
+            END IF;
+        EXCEPTION
+            WHEN OTHERS THEN
+                RAISE_APPLICATION_ERROR(-20005, 'Error al verificar condición con ID ' || p_idCondicion);
+        END;
+
+        -- Si todos los valores existen, insertar el nuevo registro
+        INSERT INTO HOSPITAL (
+            IDHOSPITAL, 
+            IDDISTRITO, 
+            NOMBRE, 
+            ANTIGUEDAD, 
+            AREA, 
+            IDSEDE, 
+            IDGERENTE, 
+            IDCONDICION, 
+            FECHAREGISTRO
+        ) VALUES (
+            p_idHospital, 
+            p_idDistrito, 
+            p_nombre, 
+            p_antiguedad, 
+            p_area, 
+            p_idSede, 
+            p_idGerente, 
+            p_idCondicion, 
+            SYSTIMESTAMP
+        );
+
+        -- Confirmar la transacción
+        COMMIT;
+    END IF;
+EXCEPTION
+    WHEN OTHERS THEN
+        -- Manejo de excepciones
+        ROLLBACK;
+        RAISE;
+END SP_HOSPITAL_REGISTRAR;
+
+
+
+
